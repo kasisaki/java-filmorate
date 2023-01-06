@@ -3,19 +3,19 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static ru.yandex.practicum.filmorate.util.Constants.DATE_LIMIT;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
     private final HashMap<Long, Film> films = new HashMap<>();
-    private final LocalDate dateLimit = LocalDate.of(1895, 12, 28);
     private long id = 0;
 
     @GetMapping
@@ -26,7 +26,7 @@ public class FilmController {
 
     @PostMapping
     @ResponseBody
-    public Film create(@Valid @RequestBody Film film) {
+    public Film create(@Valid @RequestBody Film film) throws ValidationException {
         checkReleaseDate(film);
         film.setId(generateId());
         films.put(film.getId(), film);
@@ -35,7 +35,7 @@ public class FilmController {
 
     @PutMapping
     @ResponseBody
-    public Film update(@Valid @RequestBody Film film) {
+    public Film update(@Valid @RequestBody Film film) throws ValidationException {
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             return film;
@@ -45,7 +45,7 @@ public class FilmController {
     }
 
     private void checkReleaseDate(Film film) throws ValidationException {
-        if (film.releaseDate.isBefore(dateLimit)) {
+        if (film.releaseDate.isBefore(DATE_LIMIT)) {
             throw new ValidationException("Release date should be after 28.12.1895");
         }
     }
