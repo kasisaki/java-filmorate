@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.util.IdGenerator;
+import ru.yandex.practicum.filmorate.customAnnotation.IsNotMatching;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -10,9 +11,11 @@ import javax.validation.constraints.Past;
 import java.time.LocalDate;
 
 @Data
+@Builder
 public class User {
-    private long id = IdGenerator.generate();
+    private long id;
     @NotBlank(message = "Login must not be empty")
+    @IsNotMatching(matchValue = ".*\\s+.*", message = "Login must not contain spaces")
     private String login;
     private String name;
     @Email(message = "Invalid email")
