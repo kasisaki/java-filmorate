@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class User {
-    private long id;
+    private int id;
     @NotBlank(message = "Login must not be empty")
     @IsNotMatching(matchValue = ".*\\s+.*", message = "Login must not contain spaces")
     private String login;

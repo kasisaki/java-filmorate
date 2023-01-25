@@ -25,5 +25,5 @@ public class Film {
     private final int duration;
     @Size(max = 200, message = "Description is too long")
     public String description;
-    private long id;
+    private int id;
 }

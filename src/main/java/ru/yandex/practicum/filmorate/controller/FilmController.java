@@ -1,49 +1,45 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final HashMap<Long, Film> films = new HashMap<>();
-    private long id = 0;
+    private final FilmStorage filmStorage;
+
+    @Autowired
+    public FilmController(FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
+    }
 
     @GetMapping
     public ArrayList<Film> findAll() {
-        log.debug("Films count: {}", films.size());
-        return new ArrayList<>(films.values());
+        return filmStorage.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Film> findFilm(@PathVariable(required = false) String id) {
+        return filmStorage.findFilm(id);
     }
 
     @PostMapping
     @ResponseBody
     public ResponseEntity<?> create(@Valid @RequestBody Film film) {
-        film.setId(generateId());
-        films.put(film.getId(), film);
-        return new ResponseEntity<>(film, HttpStatus.OK);
+        return filmStorage.create(film);
     }
 
     @PutMapping
     @ResponseBody
     public ResponseEntity<?> update(@Valid @RequestBody Film film) { //переделал без выкидывания исключений
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            return new ResponseEntity<>(film, HttpStatus.OK);
-        } else {
-            log.debug("No film found to update");
-            return new ResponseEntity<>(film, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    private long generateId() {
-        return ++id;
+        return filmStorage.update(film);
     }
 }
