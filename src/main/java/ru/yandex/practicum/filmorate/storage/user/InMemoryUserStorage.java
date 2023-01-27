@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -16,21 +17,16 @@ public class InMemoryUserStorage implements UserStorage {
     private final HashMap<Integer, User> users = new HashMap<>();
     private int id = 0;
 
-    public ArrayList<User> findAll() {
+    public List<User> findAll() {
         log.debug("Users count: {}", users.size());
         return new ArrayList<>(users.values());
     }
 
-    public ResponseEntity<User> findUser(String id) {
-        User user = users.get(Integer.parseInt(id));
-
-        if (user == null) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public User findUser(Integer id) {
+        return users.get(id);
     }
 
-    public ResponseEntity<User> create(User user) {
+    public User create(User user) {
         if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
             log.warn("Name is not provided and set to match login");
@@ -38,17 +34,17 @@ public class InMemoryUserStorage implements UserStorage {
         user.setId(generateId());
         users.put(user.getId(), user);
         log.debug("User with login \"{}\" added.", user.getLogin());
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return user;
     }
 
-    public ResponseEntity<User> update(User user) {
+    public User update(User user) {
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
-            log.debug("User with login \"{}\" updated.", user.getLogin());
-            return new ResponseEntity<>(user, HttpStatus.OK);
+            log.debug("User with id \"{}\" updated.", user.getId());
+            return user;
         } else {
             log.debug("No user with id " + user.getId());
-            return new ResponseEntity<>(user, HttpStatus.NOT_FOUND);
+            return null;
         }
     }
 
