@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +13,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
+    }
+
+    public List<User> findAll() {
+        return userStorage.findAll();
+    }
+
+    public ResponseEntity<User> findUser(int id) {
+        User foundUser = userStorage.findUser(id);
+        if (foundUser == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                String.format("No user found with id = %d", id));
+        return new ResponseEntity<>(foundUser, HttpStatus.OK);
+    }
+
+    public ResponseEntity<User> create(User user) {
+        return new ResponseEntity<>(userStorage.create(user), HttpStatus.OK);
+    }
+
+    public ResponseEntity<User> update(User user) {
+        User updatedUser = userStorage.update(user);
+        if (updatedUser == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                String.format("No user found to update with id = %d", user.getId()));
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     public ResponseEntity<User> addFriend(int userId, int userToAddId) {

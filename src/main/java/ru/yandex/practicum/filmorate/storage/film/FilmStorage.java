@@ -4,11 +4,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
+import java.util.List;
 
 public interface FilmStorage {
 
-    ArrayList<Film> findAll();
+    List<Film> findAll();
 
     Film findFilm(int id);
 

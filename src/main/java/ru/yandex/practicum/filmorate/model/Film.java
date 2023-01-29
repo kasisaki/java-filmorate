@@ -20,7 +20,7 @@ import static ru.yandex.practicum.filmorate.util.Constants.DESCRIPTION_MAX_LENGT
 @Builder
 public class Film {
 
-    private Set<Integer> liked = new HashSet<>();
+    private final Set<Integer> likesFromUsers = new HashSet<>();
     @NotNull(message = "Release date must not be null")
     @IsAfter(dateLimit = DATE_LIMIT, message = "Wrong release date")
     public final LocalDate releaseDate;
