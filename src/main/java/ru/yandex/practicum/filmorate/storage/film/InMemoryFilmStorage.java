@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -22,28 +20,24 @@ public class InMemoryFilmStorage implements FilmStorage {
         return new ArrayList<>(films.values());
     }
 
-    public ResponseEntity<Film> findFilm(String id) {
-        Film film = films.get(Integer.parseInt(id));
-
-        if (film == null) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(film, HttpStatus.OK);
+    public Film findFilm(int id) {
+        return films.get(id);
     }
 
-    public ResponseEntity<Film> create(Film film) {
+    public Film create(Film film) {
         film.setId(generateId());
         films.put(film.getId(), film);
-        return new ResponseEntity<>(film, HttpStatus.OK);
+        return film;
     }
 
-    public ResponseEntity<Film> update(Film film) { //переделал без выкидывания исключений
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            return new ResponseEntity<>(film, HttpStatus.OK);
+    public Film update(Film film) {
+        int filmId = film.getId();
+        if (films.containsKey(filmId)) {
+            films.put(filmId, film);
+            return film;
         } else {
             log.debug("No film found to update");
-            return new ResponseEntity<>(film, HttpStatus.NOT_FOUND);
+            return null;
         }
     }
 

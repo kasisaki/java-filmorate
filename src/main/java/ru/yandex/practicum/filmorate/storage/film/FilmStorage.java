@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -11,9 +10,9 @@ public interface FilmStorage {
 
     ArrayList<Film> findAll();
 
-    ResponseEntity<Film> findFilm(String id);
+    Film findFilm(int id);
 
-    ResponseEntity<?> create(@Valid @RequestBody Film film);
+    Film create(@Valid @RequestBody Film film);
 
-    ResponseEntity<?> update(@Valid @RequestBody Film film);
+    Film update(@Valid @RequestBody Film film);
 }

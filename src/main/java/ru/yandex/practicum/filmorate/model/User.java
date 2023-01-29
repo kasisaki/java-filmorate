@@ -16,7 +16,8 @@ import java.util.Set;
 @Builder
 public class User {
     private int id;
-    private Set<Integer> friends = new HashSet<>();
+    private final Set<Integer> friends = new HashSet<>();
+    private final Set<Integer> likedFilms = new HashSet<>();
     @NotBlank(message = "Login must not be empty")
     @IsNotMatching(matchValue = ".*\\s+.*", message = "Login must not contain spaces")
     private String login;

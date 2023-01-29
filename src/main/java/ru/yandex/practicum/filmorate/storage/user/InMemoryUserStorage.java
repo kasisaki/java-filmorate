@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -38,14 +36,20 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User update(User user) {
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.debug("User with id \"{}\" updated.", user.getId());
-            return user;
-        } else {
-            log.debug("No user with id " + user.getId());
+        User foundUser = findUser(user.getId());
+        if (foundUser == null) {
+            log.warn("No user with id " + user.getId());
             return null;
         }
+        foundUser.setLogin(user.getLogin());
+        foundUser.setName(user.getName());
+        if (foundUser.getName() == null || foundUser.getName().equals("")) {
+            foundUser.setName(foundUser.getLogin());
+        }
+        foundUser.setBirthday(user.getBirthday());
+        foundUser.setEmail(user.getEmail());
+        log.debug("User with id \"{}\" updated.", user.getId());
+        return user;
     }
 
     private int generateId() {
