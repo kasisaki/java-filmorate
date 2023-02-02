@@ -17,7 +17,9 @@ import java.util.Set;
 public class User {
     private int id;
     private final Set<Integer> friends = new HashSet<>();
-    private final Set<Integer> likedFilms = new HashSet<>();
+    //likedFilms использовал, чтобы не проходиться по списку фильмов и считать лайки пользователя, когда может пригодиться
+// список понравившихся фильмов. Но сейчас думаю, что после внедрения БД необходимость отпадет.
+    //Удалил
     @NotBlank(message = "Login must not be empty")
     @IsNotMatching(matchValue = ".*\\s+.*", message = "Login must not contain spaces")
     private String login;

@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +16,9 @@ import static ru.yandex.practicum.filmorate.util.Constants.FILM_COUNT_DEFAULT;
 @RestController
 @RequestMapping("/films")
 @Slf4j
+@RequiredArgsConstructor
 public class FilmController {
     private final FilmService filmService;
-
-    @Autowired
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
-    }
 
     @GetMapping
     public List<Film> findAll() {
@@ -39,7 +35,6 @@ public class FilmController {
         if (count == null || count <= 0) {
             return filmService.getPopular(FILM_COUNT_DEFAULT);
         }
-        System.out.println("WE ARE HERE " + filmService.getPopular(FILM_COUNT_DEFAULT));
         return filmService.getPopular(count);
     }
 

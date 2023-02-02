@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +16,10 @@ import java.util.List;
 @RequestMapping("/users")
 @Slf4j
 @Getter
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping
     public List<User> findAll() {
@@ -34,6 +30,7 @@ public class UserController {
     public ResponseEntity<User> findUser(@PathVariable(required = false) int id) { //string id changed to int
         return userService.findUser(id);
     }
+
     @GetMapping("{id}/friends")
     public ResponseEntity<List<User>> getAllFriends(@PathVariable int id) {
         return new ResponseEntity<>(userService.findAllFriends(id), HttpStatus.OK);

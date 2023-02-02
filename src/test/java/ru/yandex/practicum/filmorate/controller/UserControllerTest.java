@@ -77,6 +77,7 @@ public class UserControllerTest {
 
         assertFalse(violations.isEmpty());
     }
+
     @Test
     public void invalidLoginWithSpace() {
         User user = User.builder().login("login space")

@@ -1,11 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -16,16 +16,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-
-    @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-    }
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -33,7 +28,7 @@ public class FilmService {
 
     public ResponseEntity<Film> findFilm(int id) {
         Film foundFilm = filmStorage.findFilm(id);
-        if (foundFilm == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found");
+        if (foundFilm == null) throw new ElementNotFoundException("Film " + id + " not found");
         return new ResponseEntity<>(foundFilm, HttpStatus.OK);
     }
 
@@ -43,7 +38,7 @@ public class FilmService {
 
     public ResponseEntity<Film> update(Film film) {
         Film updatedFilm = filmStorage.update(film);
-        if (updatedFilm == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No film found to update");
+        if (updatedFilm == null) throw new ElementNotFoundException("Film " + film.getId() + " not found");
         return new ResponseEntity<>(updatedFilm, HttpStatus.OK);
     }
 
@@ -52,14 +47,13 @@ public class FilmService {
         User user = userStorage.findUser(userId);
 
         if (foundFilm == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found");
+            throw new ElementNotFoundException("Film " + filmId + " not found");
         }
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            throw new ElementNotFoundException("User " + userId + " not found");
         }
 
         foundFilm.getLikesFromUsers().add(userId);
-        user.getLikedFilms().add(filmId);
         return foundFilm;
     }
 
@@ -68,13 +62,12 @@ public class FilmService {
         User user = userStorage.findUser(userId);
 
         if (foundFilm == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found");
+            throw new ElementNotFoundException("Film " + filmId + " not found");
         }
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            throw new ElementNotFoundException("User " + userId + " not found");
         }
         foundFilm.getLikesFromUsers().remove(userId);
-        user.getLikedFilms().remove(filmId);
         return foundFilm;
     }
 
