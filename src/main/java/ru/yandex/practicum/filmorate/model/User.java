@@ -3,16 +3,13 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.customAnnotation.IsNotMatching;
-import ru.yandex.practicum.filmorate.util.enums.FriendshipStatusEnum;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -21,9 +18,6 @@ public class User {
     private int id;
     private final Set<Integer> friends = new HashSet<>();
 
-    //likedFilms использовал, чтобы не проходиться по списку фильмов и считать лайки пользователя, когда может пригодиться
-// список понравившихся фильмов. Но сейчас думаю, что после внедрения БД необходимость отпадет.
-    //Удалил
     @NotBlank(message = "Login must not be empty")
     @IsNotMatching(matchValue = ".*\\s+.*", message = "Login must not contain spaces")
     private String login;

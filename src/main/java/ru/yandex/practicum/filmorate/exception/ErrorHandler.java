@@ -24,4 +24,16 @@ public class ErrorHandler {
         log.error(e.getMessage(), e);
         return new ResponseEntity<>(new ErrorResponse(NOT_FOUND.value(), e.getMessage()), NOT_FOUND);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> catchDuplicateEmailException(final DuplicateEmailException e) {
+        log.error(e.getMessage(), e);
+        return new ResponseEntity<>(new ErrorResponse(BAD_REQUEST.value(), e.getMessage()), BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> catchDuplicateLoginException(final DuplicateLoginException e) {
+        log.error(e.getMessage(), e);
+        return new ResponseEntity<>(new ErrorResponse(BAD_REQUEST.value(), e.getMessage()), BAD_REQUEST);
+    }
 }

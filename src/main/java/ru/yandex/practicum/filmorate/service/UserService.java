@@ -24,16 +24,22 @@ public class UserService {
     }
 
     public ResponseEntity<User> findUser(int id) {
-        User foundUser = userStorage.findUser(id);
-        if (foundUser == null) throw new ElementNotFoundException(String.format("User %d not found", id));
-        return new ResponseEntity<>(foundUser, HttpStatus.OK);
+        return new ResponseEntity<>(userStorage.findUser(id), HttpStatus.OK);
     }
 
     public ResponseEntity<User> create(User user) {
+        if (user.getName() == null || user.getName().equals("")) {
+            user.setName(user.getLogin());
+            log.warn("Name is not provided and set to match login");
+        }
         return new ResponseEntity<>(userStorage.create(user), HttpStatus.OK);
     }
 
     public ResponseEntity<User> update(User user) {
+        if (user.getName() == null || user.getName().equals("")) {
+            user.setName(user.getLogin());
+            log.warn("Name is not provided and set to match login");
+        }
         User updatedUser = userStorage.update(user);
         if (updatedUser == null) throw new ElementNotFoundException(String.format("User %d not found", user.getId()));
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);

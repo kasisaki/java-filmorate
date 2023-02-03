@@ -2,9 +2,10 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -52,7 +53,7 @@ public class UserControllerTest {
 
                 .build();
 
-        UserController userController = new UserController(new UserService(new InMemoryUserStorage()));
+        UserController userController = new UserController(new UserService(new UserDbStorage(new JdbcTemplate())));
 
         userController.create(user);
 

@@ -43,38 +43,36 @@ public class FilmService {
     }
 
     public Film like(int filmId, int userId) {
+        checkExistence(filmId, userId);
         Film foundFilm = filmStorage.findFilm(filmId);
-        User user = userStorage.findUser(userId);
-
-        if (foundFilm == null) {
-            throw new ElementNotFoundException("Film " + filmId + " not found");
-        }
-        if (user == null) {
-            throw new ElementNotFoundException("User " + userId + " not found");
-        }
-
         foundFilm.getLikesFromUsers().add(userId);
         return foundFilm;
     }
 
     public Film unlike(int filmId, int userId) {
+        checkExistence(filmId, userId);
         Film foundFilm = filmStorage.findFilm(filmId);
-        User user = userStorage.findUser(userId);
-
-        if (foundFilm == null) {
-            throw new ElementNotFoundException("Film " + filmId + " not found");
-        }
-        if (user == null) {
-            throw new ElementNotFoundException("User " + userId + " not found");
-        }
         foundFilm.getLikesFromUsers().remove(userId);
         return foundFilm;
     }
+
 
     public List<Film> getPopular(int limitTo) {
         return filmStorage.findAll().stream()
                 .sorted((film1, film2) -> film2.getLikesFromUsers().size() - film1.getLikesFromUsers().size())
                 .limit(limitTo)
                 .collect(Collectors.toList());
+    }
+
+    private void checkExistence(int filmId, int userId) {
+        Film foundFilm = filmStorage.findFilm(filmId);
+        User user = userStorage.findUser(userId);
+
+        if (foundFilm == null) {
+            throw new ElementNotFoundException("Film " + filmId + " not found");
+        }
+        if (user == null) {
+            throw new ElementNotFoundException("User " + userId + " not found");
+        }
     }
 }

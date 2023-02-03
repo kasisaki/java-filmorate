@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class InMemoryUserStorage implements UserStorage {
+public class InMemoryUserStorage {
 
     private final HashMap<Integer, User> users = new HashMap<>();
     private int id = 0;
