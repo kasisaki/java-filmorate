@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.exception;
+package ru.yandex.practicum.filmorate.exception.dbException;
 
 public class DuplicateLoginException extends RuntimeException {
     public DuplicateLoginException() {

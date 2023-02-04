@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -46,56 +48,30 @@ public class UserService {
     }
 
     public ResponseEntity<User> addFriend(int userId, int userToAddId) {
-        User user = userStorage.findUser(userId);
-        User userToAdd = userStorage.findUser((userToAddId));
-        if (user == null || userToAdd == null) {
-            throw new ElementNotFoundException("User " + userId + " not found and" +
-                    " therefore cannot be added to friend list");
-        } else if (userToAdd.getId() == user.getId()) {
+        if (userId == userToAddId) {
             throw new BadRequestException("We don't add ourselves to our friend list");
-        } else if (userToAdd.getFriends().contains(user.getId())) {
-            throw new BadRequestException("User " + userToAddId + " is already in your friend list");
         }
-        user.getFriends().add(userToAdd.getId());
-        userToAdd.getFriends().add(user.getId());
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userStorage.addFriend(userId, userToAddId), HttpStatus.OK);
+    }
+
+    public ResponseEntity<User> acceptFriend(int userId, int userToAddId) {
+        return new ResponseEntity<>(userStorage.acceptFriend(userId, userToAddId), HttpStatus.OK);
     }
 
     public ResponseEntity<User> removeFriend(int id, int friendId) {
-        User user = userStorage.findUser(id);
-        User friend = userStorage.findUser(friendId);
-        if (!user.getFriends().contains(friend.getId())) {
-            throw new BadRequestException(String.format("User %d is not in your" +
-                    " friend list", friend.getId()));
-        }
-        user.getFriends().remove(friend.getId());
-        friend.getFriends().remove(user.getId());
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userStorage.deleteFriend(id, friendId), HttpStatus.OK);
     }
 
     public List<User> findAllFriends(int id) {
-        List<User> listOfFriends = new ArrayList<>();
-        for (int friendId : userStorage.findUser(id).getFriends()) {
-            listOfFriends.add(userStorage.findUser(friendId));
-        }
-        return listOfFriends;
+        return userStorage.findFriends(id);
     }
 
     public List<User> findCommonFriends(int userId, int friendId) {
-        ArrayList<User> commonFriends = new ArrayList<>();
-        User friend = userStorage.findUser(friendId);
-        User user = userStorage.findUser(userId);
-        if (user == null) {
-            throw new ElementNotFoundException("User " + userId + " not found");
-        }
-        if (friend == null) {
-            throw new ElementNotFoundException("User " + friendId + " not found");
-        }
-        for (Integer friendsId : user.getFriends()) {
-            if (friend.getFriends().contains(friendsId)) {
-                commonFriends.add(userStorage.findUser(friendsId));
-            }
-        }
-        return commonFriends;
+        return userStorage.findFriends(userId).stream().filter(u ->
+                userStorage.findFriends(friendId).contains(u)).collect(Collectors.toList());
+    }
+
+    public ResponseEntity<User> delete(int id) {
+        return new ResponseEntity<>(userStorage.delete(id), HttpStatus.OK);
     }
 }

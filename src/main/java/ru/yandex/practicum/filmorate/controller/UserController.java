@@ -56,6 +56,16 @@ public class UserController {
         return userService.addFriend(id, friendId);
     }
 
+    @PutMapping("/{id}/friends/{friendId}/status")
+    public ResponseEntity<User> acceptFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        return userService.acceptFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> delete(@PathVariable("id") int id) {
+        return userService.delete(id);
+    }
+
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<User> deleteFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
         return userService.removeFriend(id, friendId);

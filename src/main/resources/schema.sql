@@ -1,3 +1,5 @@
+DROP ALL OBJECTS DELETE FILES;
+
 CREATE TABLE IF NOT EXISTS mpa
 (
     mpa_id int2 PRIMARY KEY AUTO_INCREMENT,
@@ -21,7 +23,6 @@ CREATE TABLE IF NOT EXISTS films
     duration     int2 CHECK (duration >= 0)
 );
 
-
 CREATE TABLE IF NOT EXISTS users
 (
     user_id  int PRIMARY KEY AUTO_INCREMENT,
@@ -36,8 +37,7 @@ CREATE TABLE IF NOT EXISTS friendships
     friendship_id int PRIMARY KEY AUTO_INCREMENT,
     from_user     int REFERENCES users (user_id) ON DELETE CASCADE,
     to_user       int REFERENCES users (user_id) ON DELETE CASCADE,
-    accepted      boolean,
-    declined      boolean
+    accepted      boolean DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS likes
