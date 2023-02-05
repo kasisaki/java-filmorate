@@ -7,13 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j

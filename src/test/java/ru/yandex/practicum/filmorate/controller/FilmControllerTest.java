@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.film.Film;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

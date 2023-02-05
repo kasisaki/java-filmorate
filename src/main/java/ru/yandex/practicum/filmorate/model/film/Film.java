@@ -1,10 +1,8 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.film;
 
 import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.customAnnotation.IsAfter;
-import ru.yandex.practicum.filmorate.util.enums.GenreEnum;
-import ru.yandex.practicum.filmorate.util.enums.MpaEnum;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -34,7 +32,7 @@ public class Film {
     @Size(max = DESCRIPTION_MAX_LENGTH, message = "Description is too long")
     public String description;
 
-    private GenreEnum genre;
-    private MpaEnum mpa;
+    private Genre[] genres;
+    private Mpa mpa;
     private int id;
 }

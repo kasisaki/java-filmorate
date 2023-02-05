@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -27,7 +27,7 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Film> findFilm(@PathVariable(required = false) int id) {
-        return filmService.findFilm(id);
+        return new ResponseEntity<>(filmService.findFilm(id), HttpStatus.OK);
     }
 
     @GetMapping("/popular")
@@ -40,7 +40,7 @@ public class FilmController {
 
     @PostMapping
     public ResponseEntity<Film> create(@Valid @RequestBody Film film) {
-        return filmService.create(film);
+        return new ResponseEntity<>(filmService.create(film), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -50,7 +50,7 @@ public class FilmController {
 
     @PutMapping
     public ResponseEntity<Film> update(@Valid @RequestBody Film film) { //переделал без выкидывания исключений
-        return filmService.update(film);
+        return new ResponseEntity<>(filmService.update(film), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/like/{userId}")

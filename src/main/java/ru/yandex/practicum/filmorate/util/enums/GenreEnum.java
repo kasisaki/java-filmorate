@@ -1,21 +1,12 @@
 package ru.yandex.practicum.filmorate.util.enums;
 
 public enum GenreEnum {
-    ACTION("Action"),
-    ADVENTURE("Adventure"),
-    ANIMATION("Animation"),
-    BIOGRAPHY("Biography"),
-    COMEDY("Comedy"),
-    CRIME("Crime"),
-    DRAMA("Drama"),
-    FANTASY("Fantasy"),
-    HISTORICAL("Historical"),
-    HORROR("Horror"),
-    MYSTERY("Mystery"),
-    ROMANCE("Romance"),
-    SCIENCE_FICTION("Science Fiction"),
-    THRILLER("Thriller"),
-    WESTERN("Western");
+    ACTION( "Боевик"),
+    CARTOON("Мультфильм"),
+    COMEDY("Комедия"),
+    DOCUMENTARY("Документальный"),
+    DRAMA("Драма"),
+    THRILLER("Триллер");
 
     private final String value;
 

@@ -4,10 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.yandex.practicum.filmorate.exception.dbException.DuplicateEmailException;
-import ru.yandex.practicum.filmorate.exception.dbException.DuplicateLoginException;
-import ru.yandex.practicum.filmorate.exception.dbException.FriendshipExistsException;
-import ru.yandex.practicum.filmorate.model.ErrorResponse;
+import ru.yandex.practicum.filmorate.exception.dbException.*;
+import ru.yandex.practicum.filmorate.model.errorResponse.ErrorResponse;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -42,6 +40,18 @@ public class ErrorHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> catchFriendshipExistsException(final FriendshipExistsException e) {
+        log.error(e.getMessage(), e);
+        return new ResponseEntity<>(new ErrorResponse(BAD_REQUEST.value(), e.getMessage()), BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> catchGenreException(final IllegalGenreException e) {
+        log.error(e.getMessage(), e);
+        return new ResponseEntity<>(new ErrorResponse(BAD_REQUEST.value(), e.getMessage()), BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> catchMpaException(final IllegalMpaException e) {
         log.error(e.getMessage(), e);
         return new ResponseEntity<>(new ErrorResponse(BAD_REQUEST.value(), e.getMessage()), BAD_REQUEST);
     }

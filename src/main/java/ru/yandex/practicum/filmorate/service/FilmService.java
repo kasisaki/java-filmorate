@@ -2,12 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.film.Film;
+import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -26,20 +24,18 @@ public class FilmService {
         return filmStorage.findAll();
     }
 
-    public ResponseEntity<Film> findFilm(int id) {
+    public Film findFilm(int id) {
         Film foundFilm = filmStorage.findFilm(id);
         if (foundFilm == null) throw new ElementNotFoundException("Film " + id + " not found");
-        return new ResponseEntity<>(foundFilm, HttpStatus.OK);
+        return foundFilm;
     }
 
-    public ResponseEntity<Film> create(Film film) {
-        return new ResponseEntity<>(filmStorage.create(film), HttpStatus.CREATED);
+    public Film create(Film film) {
+        return filmStorage.create(film);
     }
 
-    public ResponseEntity<Film> update(Film film) {
-        Film updatedFilm = filmStorage.update(film);
-        if (updatedFilm == null) throw new ElementNotFoundException("Film " + film.getId() + " not found");
-        return new ResponseEntity<>(updatedFilm, HttpStatus.OK);
+    public Film update(Film film) {
+        return filmStorage.update(film);
     }
 
     public Film like(int filmId, int userId) {
@@ -63,6 +59,7 @@ public class FilmService {
                 .limit(limitTo)
                 .collect(Collectors.toList());
     }
+
 
     private void checkExistence(int filmId, int userId) {
         Film foundFilm = filmStorage.findFilm(filmId);

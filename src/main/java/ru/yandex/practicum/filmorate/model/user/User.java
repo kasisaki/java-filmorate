@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.user;
 
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +16,6 @@ import java.util.Set;
 @Builder
 public class User {
     private int id;
-    private final Set<Integer> friends = new HashSet<>();
-
     @NotBlank(message = "Login must not be empty")
     @IsNotMatching(matchValue = ".*\\s+.*", message = "Login must not contain spaces")
     private String login;

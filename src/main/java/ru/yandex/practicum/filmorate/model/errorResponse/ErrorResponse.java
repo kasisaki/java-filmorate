@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.errorResponse;
 
 public class ErrorResponse {
     private int statusCode;

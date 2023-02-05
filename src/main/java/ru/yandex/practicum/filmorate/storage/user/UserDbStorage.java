@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.exception.dbException.DuplicateEmailException;
 import ru.yandex.practicum.filmorate.exception.dbException.DuplicateLoginException;
 import ru.yandex.practicum.filmorate.exception.dbException.FriendshipExistsException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.user.User;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
