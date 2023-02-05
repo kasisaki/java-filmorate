@@ -44,8 +44,9 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity<Film> likeFilm(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
-        return new ResponseEntity<>(filmService.like(filmId, userId), HttpStatus.OK);
+    public ResponseEntity<String> likeFilm(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+        filmService.like(filmId, userId);
+        return new ResponseEntity<>("Liked", HttpStatus.OK);
     }
 
     @PutMapping
@@ -54,7 +55,8 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<Film> unlike(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
-        return new ResponseEntity<>(filmService.unlike(filmId, userId), HttpStatus.OK);
+    public ResponseEntity<String> unlike(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+        filmService.unlike(filmId, userId);
+        return new ResponseEntity<>("Unliked", HttpStatus.OK);
     }
 }

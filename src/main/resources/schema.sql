@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS friendships
     PRIMARY KEY (from_user, to_user)
 );
 
-CREATE TABLE IF NOT EXISTS likes
+CREATE TABLE IF NOT EXISTS film_likes
 (
     film_id int REFERENCES films (film_id) ON DELETE CASCADE,
     user_id int REFERENCES users (user_id) ON DELETE CASCADE,

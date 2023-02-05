@@ -15,4 +15,10 @@ public interface FilmStorage {
     Film create(@Valid @RequestBody Film film);
 
     Film update(@Valid @RequestBody Film film);
+
+    void like(int filmId, int userId);
+
+    void unlike(int filmId, int userId);
+
+    List<Film> getPopular(int limitTo);
 }
