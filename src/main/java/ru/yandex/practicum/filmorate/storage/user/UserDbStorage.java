@@ -29,15 +29,13 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> findAll() {
         String sql = "SELECT * FROM users";
-        return jdbcTemplate.query(sql, ((urs, rowNum) -> {
-            return User.builder()
-                    .id(urs.getInt("user_id"))
-                    .login(urs.getString("login"))
-                    .name(urs.getString("name"))
-                    .email(urs.getString("email"))
-                    .birthday(Objects.requireNonNull(urs.getDate("birthday")).toLocalDate())
-                    .build();
-        }));
+        return jdbcTemplate.query(sql, ((urs, rowNum) -> User.builder()
+                .id(urs.getInt("user_id"))
+                .login(urs.getString("login"))
+                .name(urs.getString("name"))
+                .email(urs.getString("email"))
+                .birthday(Objects.requireNonNull(urs.getDate("birthday")).toLocalDate())
+                .build()));
     }
 
     @Override

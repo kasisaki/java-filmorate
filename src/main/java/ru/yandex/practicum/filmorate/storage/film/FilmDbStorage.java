@@ -8,8 +8,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
-import ru.yandex.practicum.filmorate.exception.dbException.IllegalGenreException;
-import ru.yandex.practicum.filmorate.exception.dbException.IllegalMpaException;
+import ru.yandex.practicum.filmorate.exception.dbException.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.dbException.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Genre;
 import ru.yandex.practicum.filmorate.model.film.Mpa;
@@ -31,7 +31,7 @@ public class FilmDbStorage implements FilmStorage {
 
     public List<Film> findAll() {
         List<Film> result = new ArrayList<>();
-        String sql = "SELECT film_id FROM films";
+        String sql = "SELECT film_id FROM films ORDER BY film_id";
         List<Integer> ids = jdbcTemplate.queryForList(sql, Integer.class);
         for (Integer id : ids) {
             result.add(findFilm(id));
@@ -74,7 +74,7 @@ public class FilmDbStorage implements FilmStorage {
         Genre[] genres = new Genre[genresMap.size()];
         int i = 0;
         for (Integer genreID : genresMap.keySet()) {
-            genres[i] = new Genre(genreID, genresMap.get(genreID));
+            genres[i] = Genre.builder().id(genreID).name(genresMap.get(genreID)).build();
             i++;
         }
         return genres;
@@ -89,14 +89,12 @@ public class FilmDbStorage implements FilmStorage {
 
         int mpaId = urs.getInt("MPA_ID");
         String mpaName = urs.getString("NAME");
-        return new Mpa(mpaId, mpaName);
+        return Mpa.builder().id(mpaId).name(mpaName).build();
     }
 
 
     public Film create(Film film) {
-        if (!jdbcTemplate.queryForRowSet("SELECT NAME FROM MPA WHERE MPA_ID =?", new Object[]{film.getMpa().getId()}).next()) {
-            throw new IllegalMpaException("Mpa with id: " + film.getMpa().getId() + " not found");
-        }
+        correctMpaOrThrow(film.getMpa().getId());
 
         String sql = "INSERT INTO FILMS (MPA_ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION) VALUES (?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -110,29 +108,38 @@ public class FilmDbStorage implements FilmStorage {
             ps.setInt(5, film.getDuration());
             return ps;
         }, keyHolder);
+
         int generatedId = Objects.requireNonNull(keyHolder.getKey()).intValue();
+
         film.setId(generatedId);
+
         film.getMpa().setName((String) jdbcTemplate.queryForObject("SELECT NAME FROM MPA WHERE MPA_ID =?",
                 new Object[]{film.getMpa().getId()}, String.class));
-        Genre[] genres = film.getGenres();
-        if (genres != null) {
-            for (Genre genre : genres) {
-                if (!jdbcTemplate.queryForRowSet("SELECT NAME FROM GENRES WHERE GENRE_ID =?", genre.getId()).next()) {
-                    throw new IllegalGenreException(String.format("Genres with id = %d not found", genre.getId()));
-                }
-                jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?,?)", generatedId, genre.getId());
-            }
-            for (Genre genre : genres) {
-                genre.setName((String) jdbcTemplate.queryForObject("SELECT name FROM genres WHERE GENRE_ID =?", new Object[]{genre.getId()}, String.class));
-            }
-        }
+
+        updateFilmGenres(generatedId, film.getGenres());
+
         return film;
     }
 
-    public Film update(Film film) {
-        if (!jdbcTemplate.queryForRowSet("SELECT NAME FROM MPA WHERE MPA_ID =?", new Object[]{film.getMpa().getId()}).next()) {
-            throw new IllegalMpaException("Mpa with id: " + film.getMpa().getId() + " not found");
+    private void updateFilmGenres(int filmId, Genre[] genres) {
+        log.warn("Movie genres cleared from database");
+        if (genres != null) {
+            for (Genre genre : genres) {
+                if (!jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM genres WHERE GENRE_ID =?", genre.getId()).next()) {
+                    throw new GenreNotFoundException(String.format("Genre with id = %d not found", genre.getId()));
+                }
+                jdbcTemplate.update("DELETE FROM FILM_GENRES WHERE FILM_ID =? AND GENRE_ID=?", filmId, genre.getId());
+                jdbcTemplate.update("INSERT INTO FILM_GENRES (film_id, genre_id) VALUES (?,?)", filmId, genre.getId());
+                genre.setName((String) jdbcTemplate.queryForObject("SELECT name FROM genres WHERE GENRE_ID =?", new Object[]{genre.getId()}, String.class));
+            }
+        } else {
+
         }
+    }
+
+    public Film update(Film film) {
+        correctMpaOrThrow(film.getMpa().getId());
+
         if (!jdbcTemplate.queryForRowSet("SELECT FILM_ID FROM FILMS WHERE FILM_ID =?", film.getId()).next()) {
             throw new ElementNotFoundException("Film with id: " + film.getId() + " not found");
         }
@@ -144,23 +151,15 @@ public class FilmDbStorage implements FilmStorage {
 
         film.getMpa().setName((String) jdbcTemplate.queryForObject("SELECT NAME FROM MPA WHERE MPA_ID =?",
                 new Object[]{film.getMpa().getId()}, String.class));
-        Genre[] genres = film.getGenres();
-        if (genres == null) {
-            return film;
-        }
-
-        for (Genre genre : genres) {
-            System.out.println(genre);
-            if (!jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM genres WHERE GENRE_ID =?", genre.getId()).next()) {
-                throw new IllegalGenreException(String.format("Genres with id = %d not found", genre.getId()));
-            }
-            jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?,?)", film.getId(), genre.getId());
-        }
-        for (Genre genre : genres) {
-            genre.setName((String) jdbcTemplate.queryForObject("SELECT name FROM genres WHERE GENRE_ID =?",
-                    new Object[]{genre.getId()}, String.class));
-        }
+        updateFilmGenres(film.getId(), film.getGenres());
 
         return film;
+    }
+
+    private void correctMpaOrThrow(int mpaId) {
+        if (!jdbcTemplate.queryForRowSet("SELECT NAME FROM MPA WHERE MPA_ID =?", mpaId).next()) {
+            throw new MpaNotFoundException("Mpa with id: " + mpaId + " not found");
+        }
+
     }
 }

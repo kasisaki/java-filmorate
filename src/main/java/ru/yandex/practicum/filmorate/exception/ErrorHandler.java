@@ -45,14 +45,14 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> catchGenreException(final IllegalGenreException e) {
+    public ResponseEntity<ErrorResponse> catchGenreException(final GenreNotFoundException e) {
         log.error(e.getMessage(), e);
-        return new ResponseEntity<>(new ErrorResponse(BAD_REQUEST.value(), e.getMessage()), BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorResponse(NOT_FOUND.value(), e.getMessage()), NOT_FOUND);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> catchMpaException(final IllegalMpaException e) {
+    public ResponseEntity<ErrorResponse> catchMpaException(final MpaNotFoundException e) {
         log.error(e.getMessage(), e);
-        return new ResponseEntity<>(new ErrorResponse(BAD_REQUEST.value(), e.getMessage()), BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorResponse(NOT_FOUND.value(), e.getMessage()), NOT_FOUND);
     }
 }
