@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -49,13 +51,14 @@ public class UserControllerTest {
                 .birthday(LocalDate.of(1999, 12, 12))
 
                 .build();
-        UserController userController = new UserController();
+
+        UserController userController = new UserController(new UserService(new InMemoryUserStorage()));
 
         userController.create(user);
 
         violations = validator.validate(user);
 
-        assertEquals(userController.getUsers().get(1L).getName(), user.getLogin());
+        assertEquals(userController.findAll().get(0).getName(), user.getLogin());
     }
 
     @Test
@@ -74,6 +77,7 @@ public class UserControllerTest {
 
         assertFalse(violations.isEmpty());
     }
+
     @Test
     public void invalidLoginWithSpace() {
         User user = User.builder().login("login space")

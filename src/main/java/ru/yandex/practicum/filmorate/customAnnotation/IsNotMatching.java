@@ -15,7 +15,10 @@ import java.lang.annotation.*;
 @Documented
 public @interface IsNotMatching {
     String message() default "Found forbidden symbol";
-    Class<?>[] groups() default { };
-    Class<? extends Payload>[] payload() default { };
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+
     String matchValue();
 }

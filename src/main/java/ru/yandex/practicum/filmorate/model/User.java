@@ -9,11 +9,17 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
 public class User {
-    private long id;
+    private int id;
+    private final Set<Integer> friends = new HashSet<>();
+    //likedFilms использовал, чтобы не проходиться по списку фильмов и считать лайки пользователя, когда может пригодиться
+// список понравившихся фильмов. Но сейчас думаю, что после внедрения БД необходимость отпадет.
+    //Удалил
     @NotBlank(message = "Login must not be empty")
     @IsNotMatching(matchValue = ".*\\s+.*", message = "Login must not contain spaces")
     private String login;

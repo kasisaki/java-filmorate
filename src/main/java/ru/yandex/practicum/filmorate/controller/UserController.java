@@ -1,59 +1,63 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
-@SuppressWarnings({"unused", "UnusedReturnValue"})
 @RestController
 @RequestMapping("/users")
 @Slf4j
 @Getter
+@RequiredArgsConstructor
 public class UserController {
-    private final HashMap<Long, User> users = new HashMap<>();
-    private long id = 0;
+
+    private final UserService userService;
 
     @GetMapping
-    public ArrayList<User> findAll() {
-        log.debug("Users count: {}", users.size());
-        return new ArrayList<>(users.values());
+    public List<User> findAll() {
+        return userService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> findUser(@PathVariable(required = false) int id) { //string id changed to int
+        return userService.findUser(id);
+    }
+
+    @GetMapping("{id}/friends")
+    public ResponseEntity<List<User>> getAllFriends(@PathVariable int id) {
+        return new ResponseEntity<>(userService.findAllFriends(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/friends/common/{friendId}")
+    public ResponseEntity<List<User>> getCommonFriends(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        return new ResponseEntity<>(userService.findCommonFriends(id, friendId), HttpStatus.OK);
     }
 
     @PostMapping
-    @ResponseBody
-    public ResponseEntity<?> create(@Valid @RequestBody User user) {
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-            System.out.println("Name is not provided and set to match login");
-            log.warn("Name is not provided and set to match login");
-        }
-        user.setId(generateId());
-        users.put(user.getId(), user);
-        log.debug("User with login \"{}\" added.", user.getLogin());
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<User> create(@Valid @RequestBody User user) {
+        return userService.create(user);
     }
 
     @PutMapping
-    @ResponseBody
-    public ResponseEntity<?> update(@Valid @RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.debug("User with login \"{}\" updated.", user.getLogin());
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            log.debug("No user with id " + user.getId());
-            return new ResponseEntity<>(user, HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<User> update(@Valid @RequestBody User user) {
+        return userService.update(user);
     }
 
-    private long generateId() {
-        return ++id;
+    @PutMapping("/{id}/friends/{friendId}")
+    public ResponseEntity<User> addFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        return userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public ResponseEntity<User> deleteFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        return userService.removeFriend(id, friendId);
     }
 }

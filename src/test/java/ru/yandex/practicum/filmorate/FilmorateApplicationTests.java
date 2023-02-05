@@ -9,11 +9,11 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 @SpringBootTest
 class FilmorateApplicationTests {
 
-	@Autowired
-	private FilmController filmController;
+    @Autowired
+    private FilmController filmController;
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

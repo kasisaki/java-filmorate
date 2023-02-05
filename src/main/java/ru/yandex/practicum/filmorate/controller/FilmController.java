@@ -1,49 +1,60 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+
+import static ru.yandex.practicum.filmorate.util.Constants.FILM_COUNT_DEFAULT;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
+@RequiredArgsConstructor
 public class FilmController {
-    private final HashMap<Long, Film> films = new HashMap<>();
-    private long id = 0;
+    private final FilmService filmService;
 
     @GetMapping
-    public ArrayList<Film> findAll() {
-        log.debug("Films count: {}", films.size());
-        return new ArrayList<>(films.values());
+    public List<Film> findAll() {
+        return filmService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Film> findFilm(@PathVariable(required = false) int id) {
+        return filmService.findFilm(id);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopular(@RequestParam(required = false) Integer count) {
+        if (count == null || count <= 0) {
+            return filmService.getPopular(FILM_COUNT_DEFAULT);
+        }
+        return filmService.getPopular(count);
     }
 
     @PostMapping
-    @ResponseBody
-    public ResponseEntity<?> create(@Valid @RequestBody Film film) {
-        film.setId(generateId());
-        films.put(film.getId(), film);
-        return new ResponseEntity<>(film, HttpStatus.OK);
+    public ResponseEntity<Film> create(@Valid @RequestBody Film film) {
+        return filmService.create(film);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public ResponseEntity<Film> likeFilm(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+        return new ResponseEntity<>(filmService.like(filmId, userId), HttpStatus.OK);
     }
 
     @PutMapping
-    @ResponseBody
-    public ResponseEntity<?> update(@Valid @RequestBody Film film) { //переделал без выкидывания исключений
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            return new ResponseEntity<>(film, HttpStatus.OK);
-        } else {
-            log.debug("No film found to update");
-            return new ResponseEntity<>(film, HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Film> update(@Valid @RequestBody Film film) { //переделал без выкидывания исключений
+        return filmService.update(film);
     }
 
-    private long generateId() {
-        return ++id;
+    @DeleteMapping("/{id}/like/{userId}")
+    public ResponseEntity<Film> unlike(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+        return new ResponseEntity<>(filmService.unlike(filmId, userId), HttpStatus.OK);
     }
 }
