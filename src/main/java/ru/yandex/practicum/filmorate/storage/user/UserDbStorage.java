@@ -60,7 +60,7 @@ public class UserDbStorage implements UserStorage {
         throwExceptionOnDuplicateLogin(user.getLogin(), 0);
         throwExceptionOnDuplicateEmail(user.getEmail(), 0);
 
-        String sql = "INSERT INTO users (login, name, email, birthday) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO users (name, email, login, birthday) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
