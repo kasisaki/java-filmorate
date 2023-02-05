@@ -46,14 +46,13 @@ public class UserDbStorage implements UserStorage {
         if (!urs.next()) {
             throw new ElementNotFoundException(String.format("User %d not found", id));
         }
-        User user = User.builder()
+        return User.builder()
                 .id(id)
                 .login(urs.getString("login"))
                 .name(urs.getString("name"))
                 .email(urs.getString("email"))
                 .birthday(Objects.requireNonNull(urs.getDate("birthday")).toLocalDate())
                 .build();
-        return user;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class UserDbStorage implements UserStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO users (name, email, login, birthday) VALUES (?, ?, ?, ?)",
+            PreparedStatement ps = connection.prepareStatement(sql,
                     new String[]{"user_id"});
             ps.setString(1, user.getName());
             ps.setString(2, user.getEmail());
@@ -188,7 +187,6 @@ public class UserDbStorage implements UserStorage {
         if (!userRows.next()) {
             throw new ElementNotFoundException(String.format("User %d not found", id));
         }
-        ;
     }
 
     private boolean checkFriendRequestExists(int fromUserId, int toUserId) {
@@ -196,6 +194,4 @@ public class UserDbStorage implements UserStorage {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sql, fromUserId, toUserId);
         return userRows.next();
     }
-
-
 }
