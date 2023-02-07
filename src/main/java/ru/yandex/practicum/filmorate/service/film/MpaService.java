@@ -2,34 +2,43 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.dbException.MpaNotFoundException;
-import ru.yandex.practicum.filmorate.model.film.Genre;
+import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Mpa;
+import ru.yandex.practicum.filmorate.storage.film.mpa.MpaStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MpaService {
     private final JdbcTemplate jdbcTemplate;
+    private final MpaStorage mpaStorage;
 
     public List<Mpa> findAll() {
-        String sql = "SELECT * FROM MPA";
-        return jdbcTemplate.query(sql, ((rs, rowNum) -> Mpa.builder()
-                .id(rs.getInt("mpa_id"))
-                .name(rs.getString("name"))
-                .build()));
+        List<Mpa> mpaList = new ArrayList<>();
+        SqlRowSet urs = mpaStorage.getAllMpa();
+
+        while (urs.next()) {
+            mpaList.add(buildMpa(urs));
+        }
+        return mpaList;
     }
 
     public Mpa findMpa(int id) {
-        List<Mpa> mpas =  jdbcTemplate.query("SELECT * FROM MPA WHERE MPA_ID =" + id , ((rs, rowNum) -> Mpa.builder()
-                .id(rs.getInt("mpa_id"))
-                .name(rs.getString("name"))
-                .build()));
-        if (mpas.size() == 0) {
-            throw new MpaNotFoundException(String.format("Mpa with id %d not found", id));
+        SqlRowSet urs = mpaStorage.getMpa(id);
+        if (urs.next()) {
+            return buildMpa(urs);
         }
-        return mpas.get(0);
+        throw new ElementNotFoundException("Mpa with id " + id + " not found");
+    }
+
+    private  Mpa buildMpa(SqlRowSet urs) {
+        return Mpa.builder()
+              .id(urs.getInt("mpa_id"))
+              .name(urs.getString("name"))
+              .build();
     }
 }

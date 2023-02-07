@@ -2,8 +2,6 @@ package ru.yandex.practicum.filmorate.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
@@ -44,15 +42,15 @@ public class UserService {
         throw new ElementNotFoundException("User with id " + id + " not found");
     }
 
-    public ResponseEntity<User> create(User user) {
+    public User create(User user) {
         if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
             log.warn("Name is not provided and set to match login");
         }
-        return new ResponseEntity<>(userStorage.create(user), HttpStatus.OK);
+        return userStorage.create(user);
     }
 
-    public ResponseEntity<User> update(User user) {
+    public User update(User user) {
         if (!userStorage.doesUserExist(user.getId())) {
             throw new ElementNotFoundException(String.format("User %d not found", user.getId()));
         }
@@ -60,10 +58,7 @@ public class UserService {
             user.setName(user.getLogin());
             log.warn("Name is not provided and set to match login");
         }
-
-        User updatedUser = userStorage.update(user);
-        if (updatedUser == null) throw new ElementNotFoundException(String.format("User %d not found", user.getId()));
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        return userStorage.update(user);
     }
 
     public String addFriend(int userAddingId, int userToAddId) {

@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Set;
 
 import static ru.yandex.practicum.filmorate.util.Constants.DATE_LIMIT;
 import static ru.yandex.practicum.filmorate.util.Constants.DESCRIPTION_MAX_LENGTH;
@@ -29,7 +30,7 @@ public class Film {
     @Size(max = DESCRIPTION_MAX_LENGTH, message = "Description is too long")
     public String description;
 
-    private Genre[] genres;
+    private Set<Genre> genres;
     private Mpa mpa;
     private int id;
 }

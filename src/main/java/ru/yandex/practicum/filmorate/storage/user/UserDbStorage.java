@@ -21,12 +21,14 @@ public class UserDbStorage implements UserStorage {
     @Override
     public SqlRowSet findAll() {
         String sql = "SELECT * FROM users";
+
         return  jdbcTemplate.queryForRowSet(sql);
     }
 
     @Override
     public SqlRowSet findUser(Integer id) {
         String sql = "SELECT * FROM users WHERE USER_ID = ?";
+
         return jdbcTemplate.queryForRowSet(sql, id);
     }
 
@@ -48,7 +50,6 @@ public class UserDbStorage implements UserStorage {
         int generatedId = Objects.requireNonNull(keyHolder.getKey()).intValue();
         user.setId(generatedId);
 
-
         return user;
     }
 
@@ -58,19 +59,21 @@ public class UserDbStorage implements UserStorage {
         String sql = "UPDATE users SET login =?, name =?, email =?, birthday =? WHERE user_id =?";
 
         jdbcTemplate.update(sql, user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), user.getId());
-
         return user;
     }
 
     @Override
     public Integer delete(Integer id) {
         String sql = "DELETE FROM users WHERE user_id =?";
+
         return jdbcTemplate.update(sql, id);
     }
 
     @Override
     public SqlRowSet findFriends(Integer id) {
-        String sql = String.format("SELECT * FROM users RIGHT JOIN ((SELECT TO_USER as t FROM FRIENDSHIPS WHERE FROM_USER = %d) UNION (SELECT FROM_USER FROM FRIENDSHIPS WHERE TO_USER= %d AND ACCEPTED= true)) ON users.user_id = t", id, id);
+        String sql = String.format("SELECT * FROM users RIGHT JOIN ((SELECT TO_USER as t FROM FRIENDSHIPS WHERE FROM_USER = %d) " +
+                "UNION (SELECT FROM_USER FROM FRIENDSHIPS WHERE TO_USER= %d AND ACCEPTED= true)) ON users.user_id = t", id, id);
+
         return jdbcTemplate.queryForRowSet(sql);
     }
 
@@ -85,23 +88,27 @@ public class UserDbStorage implements UserStorage {
     @Override
     public Integer acceptFriend(int userAcceptingId, int userToAcceptId) {
         String sql = "UPDATE friendships SET accepted = true WHERE from_user =? AND to_user =?";
+
         return jdbcTemplate.update(sql, userToAcceptId, userAcceptingId);
     }
 
     @Override
     public Integer removeFriend(int userId, int userToDeleteId, String status) {
         String sql = "DELETE FROM friendships WHERE from_user =? AND to_user =?";
+
         return jdbcTemplate.update(sql + status, userId, userToDeleteId);
     }
 
     public boolean doesUserExist(int id) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE USER_ID = ?", id);
+
         return  userRows.next();
     }
 
     public boolean doesFriendRequestExists(int fromUserId, int toUserId) {
         String sql = "SELECT * FROM friendships WHERE from_user =? AND to_user =?";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sql, fromUserId, toUserId);
+
         return userRows.next();
     }
 }

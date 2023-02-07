@@ -1,37 +1,42 @@
 package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.dbException.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Genre;
+import ru.yandex.practicum.filmorate.storage.film.genre.GenreStorage;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class GenreService {
-    private final JdbcTemplate jdbcTemplate;
+    private final GenreStorage genreStorage;
 
+    public Set<Genre> findAllGenres() {
+        Set<Genre> GenreSet = new HashSet<>();
+        SqlRowSet urs = genreStorage.findAllGenres();
 
-
-    public List<Genre> findAll() {
-        String sql = "SELECT * FROM GENRES";
-        return jdbcTemplate.query(sql, ((rs, rowNum) -> Genre.builder()
-                .id(rs.getInt("genre_id"))
-                .name(rs.getString("name"))
-                .build()));
+        while (urs.next()) {
+            GenreSet.add(buildGenre(urs));
+        }
+        return GenreSet;
     }
 
     public Genre findGenre(int id) {
-        List<Genre> genres =  jdbcTemplate.query("SELECT * FROM GENRES WHERE genre_id =" + id , ((urs, rowNum) -> Genre.builder()
+        SqlRowSet urs = genreStorage.findGenre(id);
+        if (urs.next()) {
+            return buildGenre(urs);
+        }
+        throw new ElementNotFoundException("Genre with id " + id + " not found");
+    }
+
+    private  Genre buildGenre(SqlRowSet urs) {
+        return Genre.builder()
                 .id(urs.getInt("genre_id"))
                 .name(urs.getString("name"))
-                .build()));
-        if (genres.size() == 0) {
-            throw new GenreNotFoundException(String.format("Genre with id %d not found", id));
-        }
-        return genres.get(0);
+                .build();
     }
 }

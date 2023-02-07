@@ -43,12 +43,12 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> create(@Valid @RequestBody User user) {
-        return userService.create(user);
+        return new ResponseEntity<>(userService.create(user), HttpStatus.OK);
     }
 
     @PutMapping
     public ResponseEntity<User> update(@Valid @RequestBody User user) {
-        return userService.update(user);
+        return new ResponseEntity<>(userService.update(user), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

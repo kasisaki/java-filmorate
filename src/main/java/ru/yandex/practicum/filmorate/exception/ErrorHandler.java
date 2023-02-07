@@ -50,6 +50,12 @@ public class ErrorHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> catchDuplicateKeyException(final DuplicateKeyException e) {
         log.warn(e.getCause().getLocalizedMessage());
-        return new ResponseEntity<>(new ErrorResponse(BAD_REQUEST.value(), "Error. User with such email or login exists"), BAD_REQUEST);
+        String field = "UNIQUE_KEY";
+        if (e.getCause().getLocalizedMessage().contains("EMAIL")) {
+            field = "EMAIL";
+        } else if (e.getCause().getLocalizedMessage().contains("LOGIN")) {
+            field = "LOGIN";
+        }
+        return new ResponseEntity<>(new ErrorResponse(BAD_REQUEST.value(), "Error. User with such " + field + " exists"), BAD_REQUEST);
     }
 }
