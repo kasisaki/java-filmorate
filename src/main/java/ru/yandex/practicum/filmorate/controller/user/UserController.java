@@ -28,12 +28,12 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> findUser(@PathVariable(required = false) int id) { //string id changed to int
-        return userService.findUser(id);
+        return new ResponseEntity<>(userService.findUser(id), HttpStatus.OK);
     }
 
     @GetMapping("{id}/friends")
     public ResponseEntity<List<User>> getAllFriends(@PathVariable int id) {
-        return new ResponseEntity<>(userService.findAllFriends(id), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findFriends(id), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/friends/common/{friendId}")
@@ -52,22 +52,22 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<User> addFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
-        return userService.addFriend(id, friendId);
+    public ResponseEntity<String> addFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        return new ResponseEntity<>(userService.addFriend(id, friendId), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/friends/{friendId}/status")
-    public ResponseEntity<User> acceptFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
-        return userService.acceptFriend(id, friendId);
+    public ResponseEntity<String> acceptFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        return new ResponseEntity<>(userService.acceptFriend(id, friendId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<User> delete(@PathVariable("id") int id) {
-        return userService.delete(id);
+    public ResponseEntity<String> delete(@PathVariable("id") int id) {
+        return new ResponseEntity<>(userService.delete(id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<User> deleteFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
-        return userService.removeFriend(id, friendId);
+    public ResponseEntity<String> deleteFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        return new ResponseEntity<>(userService.removeFriend(id, friendId), HttpStatus.OK);
     }
 }

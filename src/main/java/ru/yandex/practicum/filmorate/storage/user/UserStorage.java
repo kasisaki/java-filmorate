@@ -1,25 +1,28 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import ru.yandex.practicum.filmorate.model.user.User;
-
-import java.util.List;
 
 public interface UserStorage {
 
-    List<User> findAll();
+    SqlRowSet findAll();
 
-    User findUser(Integer id);
+    SqlRowSet findUser(Integer id);
 
     User create(User user);
 
     User update(User user);
-    User delete(Integer id);
+    Integer delete(Integer id);
 
-    User acceptFriend(int userId, int userToAddId);
+    Integer acceptFriend(int userId, int userToAddId);
 
-    User addFriend(int userId, int userToAddId);
+    Integer addFriend(int userId, int userToAddId);
 
-    List<User> findFriends(Integer id);
+    SqlRowSet findFriends(Integer id);
 
-    User deleteFriend(int id, int friendId);
+    Integer removeFriend(int id, int friendId, String status);
+
+    boolean doesUserExist(int userAddingId);
+
+    boolean doesFriendRequestExists(int userAddingId, int userToAddId);
 }

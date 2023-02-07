@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
-import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -54,12 +53,11 @@ public class FilmService {
 
     private void checkExistence(int filmId, int userId) {
         Film foundFilm = filmStorage.findFilm(filmId);
-        User user = userStorage.findUser(userId);
 
         if (foundFilm == null) {
             throw new ElementNotFoundException("Film " + filmId + " not found");
         }
-        if (user == null) {
+        if (!userStorage.findUser(userId).next()) {
             throw new ElementNotFoundException("User " + userId + " not found");
         }
     }

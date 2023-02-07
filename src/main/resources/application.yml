@@ -16,7 +16,7 @@ spring:
 
 logging:
   level:
-    root: WARN
+    root: INFO
     org:
       springframework:
         jdbc: WARN
