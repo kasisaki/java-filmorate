@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
+import ru.yandex.practicum.filmorate.model.film.Genre;
 import ru.yandex.practicum.filmorate.model.film.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -13,10 +14,10 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
@@ -24,8 +25,16 @@ public class FilmService {
     private final GenreService genreService;
     private final MpaService mpaService;
 
+    @Autowired
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage, GenreService genreService, MpaService mpaService) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.genreService = genreService;
+        this.mpaService = mpaService;
+    }
+
     public List<Film> findAll() {
-        return buildFilmsList(userStorage.findAll());
+        return buildFilmsList(filmStorage.findAll());
     }
 
     public Film findFilm(int id) {
@@ -38,25 +47,20 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        return filmStorage.update(film);
+        filmStorage.update(film);
+        Mpa filmMpa = mpaService.findMpa(film.getMpa().getId());
+        Set<Genre> genres = genreService.getGenresOfFilm(film.getId());
+        film.setGenres(genres);
+        film.setMpa(filmMpa);
+        return film;
     }
 
-
-
-
-
-
-
-
-
     public Film create(Film film) {
-        Integer generatedId = filmStorage.create(film);
-
-        film.setId(generatedId);
-
         film.setMpa(mpaService.findMpa(film.getMpa().getId()));
+        Integer generatedId = filmStorage.create(film);
+        film.setId(generatedId);
+        film.setGenres(genreService.getGenresOfFilm(film.getId()));
 
-        updateFilmGenres(generatedId, film.getGenres());
         return film;
     }
 
@@ -106,8 +110,8 @@ public class FilmService {
                 .description(urs.getString("description"))
                 .releaseDate(Objects.requireNonNull(urs.getDate("release_date")).toLocalDate())
                 .duration(urs.getInt("duration"))
-                .genres(genreStorage.getGenresOfFilmFromDB(filmId))
-                .mpa(mpaStorage.getMpaFromDB(filmId))
+                .genres(genreService.getGenresOfFilm(filmId))
+                .mpa(mpaService.findMpa(urs.getInt("MPA_ID")))
                 .build();
     }
 

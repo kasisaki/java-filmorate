@@ -99,12 +99,14 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.update(sql + status, userId, userToDeleteId);
     }
 
-    public boolean doesUserExist(int id) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE USER_ID = ?", id);
+    @Override
+    public boolean doesUserExist(int user_id) {
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE USER_ID = ?", user_id);
 
         return  userRows.next();
     }
 
+    @Override
     public boolean doesFriendRequestExists(int fromUserId, int toUserId) {
         String sql = "SELECT * FROM friendships WHERE from_user =? AND to_user =?";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sql, fromUserId, toUserId);

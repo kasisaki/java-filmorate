@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
@@ -14,7 +13,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MpaService {
-    private final JdbcTemplate jdbcTemplate;
     private final MpaStorage mpaStorage;
 
     public List<Mpa> findAll() {

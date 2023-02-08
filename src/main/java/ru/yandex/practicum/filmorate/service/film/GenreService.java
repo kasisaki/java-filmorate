@@ -1,16 +1,17 @@
 package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Genre;
 import ru.yandex.practicum.filmorate.storage.film.genre.GenreStorage;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class GenreService {
     private final GenreStorage genreStorage;
@@ -31,6 +32,29 @@ public class GenreService {
             return buildGenre(urs);
         }
         throw new ElementNotFoundException("Genre with id " + id + " not found");
+    }
+
+    public Set<Genre> getSetOfGenresByIds(List<Integer> ids) {
+        Set<Genre> GenreSet = new HashSet<>();
+        for (Integer id : ids) {
+            GenreSet.add(findGenre(id));
+        }
+        return GenreSet;
+    }
+
+    public Set<Genre> getGenresOfFilm(Integer filmId) {
+        SqlRowSet urs = genreStorage.getGenresOfFilmFromDB(filmId);
+
+        Map<Integer, String> genresMap = new HashMap<>();
+
+        while (urs.next()) {
+            genresMap.put(urs.getInt("GENRE_ID"), urs.getString("name"));
+        }
+        Set<Genre> genres = new HashSet<>();
+        for (Integer genreID : genresMap.keySet()) {
+            genres.add(Genre.builder().id(genreID).name(genresMap.get(genreID)).build());
+        }
+        return genres;
     }
 
     private  Genre buildGenre(SqlRowSet urs) {

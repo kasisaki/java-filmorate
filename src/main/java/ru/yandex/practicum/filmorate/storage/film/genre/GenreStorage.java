@@ -8,5 +8,5 @@ public interface GenreStorage {
 
     SqlRowSet findAllGenres();
 
-    //Genre[] getGenresOfFilmFromDB(int id);
+    SqlRowSet getGenresOfFilmFromDB(int id);
 }

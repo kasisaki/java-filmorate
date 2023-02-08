@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     Integer create(@Valid @RequestBody Film film);
 
-    Film update(@Valid @RequestBody Film film);
+    Integer update(@Valid @RequestBody Film film);
 
     void like(int filmId, int userId);
 

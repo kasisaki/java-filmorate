@@ -7,9 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.exception.dbException.GenreNotFoundException;
-import ru.yandex.practicum.filmorate.exception.dbException.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Genre;
 
@@ -39,8 +37,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Integer create(Film film) {
-        correctMpaOrThrow(film.getMpa().getId());
-
         String sql = "INSERT INTO FILMS (MPA_ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION) VALUES (?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -53,6 +49,8 @@ public class FilmDbStorage implements FilmStorage {
             ps.setInt(5, film.getDuration());
             return ps;
         }, keyHolder);
+
+        updateFilmGenres(film.getId(), film.getGenres());
 
         return Objects.requireNonNull(keyHolder.getKey()).intValue();
     }
@@ -73,29 +71,40 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film film) {
-        correctMpaOrThrow(film.getMpa().getId());
-
-        if (!jdbcTemplate.queryForRowSet("SELECT FILM_ID FROM FILMS WHERE FILM_ID =?", film.getId()).next()) {
-            throw new ElementNotFoundException("Film with id: " + film.getId() + " not found");
-        }
-
+    public Integer update(Film film) {
         String sql = "UPDATE films SET NAME =?, DESCRIPTION =?, RELEASE_DATE =?, DURATION =?, MPA_ID =? WHERE FILM_ID =?";
+        updateFilmGenres(film.getId(), film.getGenres());
 
-        jdbcTemplate.update(sql, film.getName(), film.getDescription(), java.sql.Date.valueOf(film.getReleaseDate()),
+        return jdbcTemplate.update(sql, film.getName(), film.getDescription(), java.sql.Date.valueOf(film.getReleaseDate()),
                 film.getDuration(), film.getMpa().getId(), film.getId());
 
-        film.getMpa().setName((String) jdbcTemplate.queryForObject("SELECT NAME FROM MPA WHERE MPA_ID =?",
-                new Object[]{film.getMpa().getId()}, String.class));
-        updateFilmGenres(film.getId(), film.getGenres());
-        film.setGenres(getGenresFromDB(film.getId()));
-        return film;
+
+//
+//        String sql = "UPDATE films SET NAME =?, DESCRIPTION =?, RELEASE_DATE =?, DURATION =?, MPA_ID =? WHERE FILM_ID =?";
+//
+//        jdbcTemplate.update(sql, film.getName(), film.getDescription(), java.sql.Date.valueOf(film.getReleaseDate()),
+//                film.getDuration(), film.getMpa().getId(), film.getId());
+//
+//        film.getMpa().setName((String) jdbcTemplate.queryForObject("SELECT NAME FROM MPA WHERE MPA_ID =?",
+//                new Object[]{film.getMpa().getId()}, String.class));
+//        updateFilmGenres(film.getId(), film.getGenres());
+//        film.setGenres(genreService.getGenresOfFilm(film.getId()));
+//        return film;
     }
 
     public SqlRowSet getFilmMpaFromDB(int filmId) {
         String sql = "SELECT MPA.MPA_ID, MPA.NAME FROM MPA LEFT JOIN FILMS F ON MPA.MPA_ID = F.MPA_ID WHERE FILM_ID = ?";
         return jdbcTemplate.queryForRowSet(sql, filmId);
     }
+//
+//    private Set<Genre> getGenresFromDB(int filmId) {
+//        SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT fg.GENRE_ID, name FROM FILM_GENRES as fg " +
+//                "LEFT JOIN GENRES g on fg.GENRE_ID = g.GENRE_ID " +
+//                "WHERE FILM_ID =?", filmId);
+//
+//        Set<Genre> genres = genreService.getGenresOfFilm(filmId);
+//        return genres;
+//    }
 
     @Override
     public void like(int filmId, int userId) {
@@ -119,13 +128,6 @@ public class FilmDbStorage implements FilmStorage {
                 "LIMIT " + limitTo + ")";
 
         return jdbcTemplate.queryForRowSet(sql);
-
-    }
-
-    private void correctMpaOrThrow(int mpaId) {
-        if (!jdbcTemplate.queryForRowSet("SELECT NAME FROM MPA WHERE MPA_ID =?", mpaId).next()) {
-            throw new MpaNotFoundException("Mpa with id: " + mpaId + " not found");
-        }
 
     }
 }
