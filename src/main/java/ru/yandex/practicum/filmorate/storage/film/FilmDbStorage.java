@@ -50,61 +50,44 @@ public class FilmDbStorage implements FilmStorage {
             return ps;
         }, keyHolder);
 
-        updateFilmGenres(film.getId(), film.getGenres());
-
-        return Objects.requireNonNull(keyHolder.getKey()).intValue();
+        int generatedId = Objects.requireNonNull(keyHolder.getKey()).intValue();
+        film.setId(generatedId);
+        updateFilmGenres(film);
+        return generatedId;
     }
 
-    private void updateFilmGenres(int filmId, Set<Genre> genres) {
+    private void updateFilmGenres(Film film) {
+        Integer filmId = film.getId();
         jdbcTemplate.update("DELETE FROM FILM_GENRES WHERE FILM_ID =?", filmId);
+        Set<Genre> genres = film.getGenres();
+        if (film.getGenres() == null) {
+            return;
+        }
         log.warn("Film Genres cleared");
-        if (genres != null) {
-            for (Genre genre : genres) {
-                if (!jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM genres WHERE GENRE_ID =?", genre.getId()).next()) {
-                    throw new GenreNotFoundException(String.format("Genre with id = %d not found", genre.getId()));
-                }
-                jdbcTemplate.update("DELETE FROM FILM_GENRES WHERE FILM_ID =? AND GENRE_ID=?", filmId, genre.getId());
-                jdbcTemplate.update("INSERT INTO FILM_GENRES (film_id, genre_id) VALUES (?,?)", filmId, genre.getId());
-                genre.setName((String) jdbcTemplate.queryForObject("SELECT name FROM genres WHERE GENRE_ID =?", new Object[]{genre.getId()}, String.class));
+        if (genres.isEmpty()) {
+            return;
+        }
+        for (Genre genre : genres) {
+            if (!jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM genres WHERE GENRE_ID =?", genre.getId()).next()) {
+                throw new GenreNotFoundException(String.format("Genre with id = %d not found", genre.getId()));
             }
+            jdbcTemplate.update("INSERT INTO FILM_GENRES (film_id, genre_id) VALUES (?,?)", filmId, genre.getId());
         }
     }
 
     @Override
     public Integer update(Film film) {
         String sql = "UPDATE films SET NAME =?, DESCRIPTION =?, RELEASE_DATE =?, DURATION =?, MPA_ID =? WHERE FILM_ID =?";
-        updateFilmGenres(film.getId(), film.getGenres());
+        updateFilmGenres(film);
 
         return jdbcTemplate.update(sql, film.getName(), film.getDescription(), java.sql.Date.valueOf(film.getReleaseDate()),
                 film.getDuration(), film.getMpa().getId(), film.getId());
-
-
-//
-//        String sql = "UPDATE films SET NAME =?, DESCRIPTION =?, RELEASE_DATE =?, DURATION =?, MPA_ID =? WHERE FILM_ID =?";
-//
-//        jdbcTemplate.update(sql, film.getName(), film.getDescription(), java.sql.Date.valueOf(film.getReleaseDate()),
-//                film.getDuration(), film.getMpa().getId(), film.getId());
-//
-//        film.getMpa().setName((String) jdbcTemplate.queryForObject("SELECT NAME FROM MPA WHERE MPA_ID =?",
-//                new Object[]{film.getMpa().getId()}, String.class));
-//        updateFilmGenres(film.getId(), film.getGenres());
-//        film.setGenres(genreService.getGenresOfFilm(film.getId()));
-//        return film;
     }
 
     public SqlRowSet getFilmMpaFromDB(int filmId) {
         String sql = "SELECT MPA.MPA_ID, MPA.NAME FROM MPA LEFT JOIN FILMS F ON MPA.MPA_ID = F.MPA_ID WHERE FILM_ID = ?";
         return jdbcTemplate.queryForRowSet(sql, filmId);
     }
-//
-//    private Set<Genre> getGenresFromDB(int filmId) {
-//        SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT fg.GENRE_ID, name FROM FILM_GENRES as fg " +
-//                "LEFT JOIN GENRES g on fg.GENRE_ID = g.GENRE_ID " +
-//                "WHERE FILM_ID =?", filmId);
-//
-//        Set<Genre> genres = genreService.getGenresOfFilm(filmId);
-//        return genres;
-//    }
 
     @Override
     public void like(int filmId, int userId) {
@@ -119,15 +102,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public SqlRowSet getPopular(int limitTo) {
-        String sql = "SELECT * FROM " +
-                "(SELECT f.FILM_ID, " +
-                "COUNT(l.film_id) AS likes " +
-                "FROM films as f LEFT JOIN FILM_LIKES as l ON f.FILM_ID = l.film_id " +
-                "GROUP BY f.FILM_ID " +
-                "ORDER BY likes DESC " +
-                "LIMIT " + limitTo + ")";
+        String sql = "SELECT * FROM FILMS as f LEFT JOIN (SELECT * FROM (SELECT f.FILM_ID, COUNT(l.film_id) AS likes FROM films as f LEFT JOIN FILM_LIKES as l ON f.FILM_ID = l.film_id GROUP BY f.FILM_ID ORDER BY likes DESC)) as lkf " +
+        "ON f.film_id = lkf.film_id " +
+        "ORDER BY likes DESC LIMIT ?";
 
-        return jdbcTemplate.queryForRowSet(sql);
+        return jdbcTemplate.queryForRowSet(sql, limitTo);
 
     }
 }

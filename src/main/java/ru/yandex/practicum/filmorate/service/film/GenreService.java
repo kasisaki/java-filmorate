@@ -16,8 +16,8 @@ import java.util.*;
 public class GenreService {
     private final GenreStorage genreStorage;
 
-    public Set<Genre> findAllGenres() {
-        Set<Genre> GenreSet = new HashSet<>();
+    public List<Genre> findAllGenres() {
+        List<Genre> GenreSet = new ArrayList<>();
         SqlRowSet urs = genreStorage.findAllGenres();
 
         while (urs.next()) {
@@ -34,13 +34,6 @@ public class GenreService {
         throw new ElementNotFoundException("Genre with id " + id + " not found");
     }
 
-    public Set<Genre> getSetOfGenresByIds(List<Integer> ids) {
-        Set<Genre> GenreSet = new HashSet<>();
-        for (Integer id : ids) {
-            GenreSet.add(findGenre(id));
-        }
-        return GenreSet;
-    }
 
     public Set<Genre> getGenresOfFilm(Integer filmId) {
         SqlRowSet urs = genreStorage.getGenresOfFilmFromDB(filmId);
@@ -50,7 +43,7 @@ public class GenreService {
         while (urs.next()) {
             genresMap.put(urs.getInt("GENRE_ID"), urs.getString("name"));
         }
-        Set<Genre> genres = new HashSet<>();
+        Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
         for (Integer genreID : genresMap.keySet()) {
             genres.add(Genre.builder().id(genreID).name(genresMap.get(genreID)).build());
         }

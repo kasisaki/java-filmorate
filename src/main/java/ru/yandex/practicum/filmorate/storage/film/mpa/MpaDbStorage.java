@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class MpaDbStorage implements MpaStorage {
-    JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     public SqlRowSet getAllMpa() {
         return jdbcTemplate.queryForRowSet("SELECT * FROM MPA");
