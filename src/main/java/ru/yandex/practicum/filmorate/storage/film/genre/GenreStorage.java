@@ -4,7 +4,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 public interface GenreStorage {
 
-    SqlRowSet findGenre(int id);
+    SqlRowSet getGenre(int id);
 
     SqlRowSet findAllGenres();
 

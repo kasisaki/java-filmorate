@@ -22,20 +22,20 @@ public class FilmController {
 
     @GetMapping
     public List<Film> findAll() {
-        return filmService.findAll();
+        return filmService.findAll(); //вернет список фильмов или пустой лист
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Film> findFilm(@PathVariable(required = false) int id) {
-        return new ResponseEntity<>(filmService.findFilm(id), HttpStatus.OK);
+    public ResponseEntity<Film> getFilm(@PathVariable(required = false) int id) {
+        return new ResponseEntity<>(filmService.getFilm(id), HttpStatus.OK); //вернет нужный фильм или исключение
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopular(@RequestParam(required = false) Integer count) {
+    public List<Film> findPopular(@RequestParam(required = false) Integer count) {
         if (count == null || count <= 0) {
-            return filmService.getPopular(FILM_COUNT_DEFAULT);
+            return filmService.findPopular(FILM_COUNT_DEFAULT);
         }
-        return filmService.getPopular(count);
+        return filmService.findPopular(count);  //вернет список популярных фильмов или пустой лист
     }
 
     @PostMapping
@@ -44,7 +44,7 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity<String> likeFilm(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {;
+    public ResponseEntity<String> likeFilm(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
         return new ResponseEntity<>(filmService.like(filmId, userId), HttpStatus.OK);
     }
 

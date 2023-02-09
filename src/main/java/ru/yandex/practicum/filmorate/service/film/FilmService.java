@@ -28,19 +28,19 @@ public class FilmService {
         return buildFilmsList(filmStorage.findAll());
     }
 
-    public Film findFilm(int id) {
-        SqlRowSet urs = filmStorage.findFilm(id);
+    public Film getFilm(int filmId) {
+        SqlRowSet urs = filmStorage.findFilm(filmId); //
         if (!urs.next()) {
-            throw new ElementNotFoundException(String.format("Film %d not found", id));
+            throw new ElementNotFoundException(String.format("Film %d not found", filmId));
         }
 
         return buildFilm(urs);
     }
 
     public Film update(Film film) {
-        findFilm(film.getId());
+        getFilm(film.getId());
         filmStorage.update(film);
-        Mpa filmMpa = mpaService.findMpa(film.getMpa().getId());
+        Mpa filmMpa = mpaService.getMpa(film.getMpa().getId());
         film.setMpa(filmMpa);
 
         setFilmGenres(film);
@@ -48,7 +48,7 @@ public class FilmService {
     }
 
     public Film create(Film film) {
-        film.setMpa(mpaService.findMpa(film.getMpa().getId()));
+        film.setMpa(mpaService.getMpa(film.getMpa().getId()));
         filmStorage.create(film);
         setFilmGenres(film);
 
@@ -68,13 +68,13 @@ public class FilmService {
         return "Unliked";
     }
 
-    public List<Film> getPopular(int limitTo) {
-        return buildFilmsList(filmStorage.getPopular(limitTo));
+    public List<Film> findPopular(int limitTo) {
+        return buildFilmsList(filmStorage.findPopular(limitTo));
     }
 
 
     private void checkExistence(int filmId, int userId) {
-        findFilm(filmId);
+        getFilm(filmId);
 
         if (!userStorage.doesUserExist(userId)) {
             throw new ElementNotFoundException("User " + userId + " not found");
@@ -90,7 +90,7 @@ public class FilmService {
                 .releaseDate(Objects.requireNonNull(urs.getDate("release_date")).toLocalDate())
                 .duration(urs.getInt("duration"))
                 .genres(genreService.getGenresOfFilm(filmId))
-                .mpa(mpaService.findMpa(urs.getInt("MPA_ID")))
+                .mpa(mpaService.getMpa(urs.getInt("MPA_ID")))
                 .build();
     }
 
@@ -108,7 +108,7 @@ public class FilmService {
         Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
         if (film.getGenres() != null) {
             for (Genre genre : film.getGenres()) {
-                genres.add(genreService.findGenre(genre.getId()));
+                genres.add(genreService.getGenre(genre.getId()));
             }
             film.setGenres(genres);
         }

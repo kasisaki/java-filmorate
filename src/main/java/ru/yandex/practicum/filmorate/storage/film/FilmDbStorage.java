@@ -30,9 +30,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public SqlRowSet findFilm(int id) {
+    public SqlRowSet findFilm(int filmId) {
         String sql = "SELECT * FROM FILMS WHERE FILM_ID = ?";
-        return jdbcTemplate.queryForRowSet(sql, id);
+        return jdbcTemplate.queryForRowSet(sql, filmId);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public SqlRowSet getPopular(int limitTo) {
+    public SqlRowSet findPopular(int limitTo) {
         String sql = "SELECT * FROM FILMS as f LEFT JOIN (SELECT * FROM (SELECT f.FILM_ID, COUNT(l.film_id) AS likes FROM films as f LEFT JOIN FILM_LIKES as l ON f.FILM_ID = l.film_id GROUP BY f.FILM_ID ORDER BY likes DESC)) as lkf " +
         "ON f.film_id = lkf.film_id " +
         "ORDER BY likes DESC LIMIT ?";

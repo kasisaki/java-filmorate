@@ -19,7 +19,7 @@ public class MpaService {
 
     public List<Mpa> findAll() {
         List<Mpa> mpaList = new ArrayList<>();
-        SqlRowSet urs = mpaStorage.getAllMpa();
+        SqlRowSet urs = mpaStorage.findAllMpa(); //or false
 
         while (urs.next()) {
             mpaList.add(buildMpa(urs));
@@ -27,8 +27,8 @@ public class MpaService {
         return mpaList;
     }
 
-    public Mpa findMpa(int id) {
-        SqlRowSet urs = mpaStorage.getMpa(id);
+    public Mpa getMpa(int id) {
+        SqlRowSet urs = mpaStorage.findMpa(id);
         if (urs.next()) {
             return buildMpa(urs);
         }

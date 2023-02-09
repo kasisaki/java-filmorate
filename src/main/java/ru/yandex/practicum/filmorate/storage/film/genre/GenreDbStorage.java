@@ -17,7 +17,7 @@ public class GenreDbStorage implements GenreStorage {
         return jdbcTemplate.queryForRowSet("SELECT * FROM GENRES ORDER BY GENRE_ID");
     }
 
-    public SqlRowSet findGenre(int id) {
+    public SqlRowSet getGenre(int id) {
         return jdbcTemplate.queryForRowSet("SELECT * FROM GENRES WHERE genre_id =?", id);
     }
 

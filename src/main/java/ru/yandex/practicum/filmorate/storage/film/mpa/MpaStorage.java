@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film.mpa;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 public interface MpaStorage {
-    public SqlRowSet getAllMpa();
+    SqlRowSet findAllMpa();
 
-    public SqlRowSet getMpa(int mpaId);
+    SqlRowSet findMpa(int mpaId);
 }

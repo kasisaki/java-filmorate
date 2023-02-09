@@ -7,20 +7,20 @@ public interface UserStorage {
 
     SqlRowSet findAll();
 
-    SqlRowSet findUser(Integer id);
+    SqlRowSet findUser(Integer userId);
 
     User create(User user);
 
     User update(User user);
-    Integer delete(Integer id);
+    Integer delete(Integer userId);
 
     Integer acceptFriend(int userId, int userToAddId);
 
     Integer addFriend(int userId, int userToAddId);
 
-    SqlRowSet findFriends(Integer id);
+    SqlRowSet findFriends(Integer userId);
 
-    Integer removeFriend(int id, int friendId, String status);
+    Integer removeFriend(int userId, int friendId, String status);
 
     boolean doesUserExist(int userAddingId);
 

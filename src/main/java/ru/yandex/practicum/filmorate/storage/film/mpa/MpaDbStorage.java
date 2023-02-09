@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public SqlRowSet getAllMpa() {
+    public SqlRowSet findAllMpa() {
         return jdbcTemplate.queryForRowSet("SELECT * FROM MPA");
     }
 
-    public SqlRowSet getMpa(int mpaId) {
+    public SqlRowSet findMpa(int mpaId) {
         return jdbcTemplate.queryForRowSet("SELECT * FROM MPA WHERE MPA_ID =?", mpaId);
     }
 

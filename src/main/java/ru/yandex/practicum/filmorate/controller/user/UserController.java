@@ -23,22 +23,22 @@ public class UserController {
 
     @GetMapping
     public List<User> findAll() {
-        return userService.findAll();
+        return userService.findAll(); //вернет список пользователей или пустой
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> findUser(@PathVariable(required = false) int id) { //string id changed to int
-        return new ResponseEntity<>(userService.findUser(id), HttpStatus.OK);
+    public ResponseEntity<User> getUser(@PathVariable(required = false) int id) {
+        return new ResponseEntity<>(userService.getUser(id), HttpStatus.OK); //вернет пользователя или исключение
     }
 
     @GetMapping("{id}/friends")
     public ResponseEntity<List<User>> getAllFriends(@PathVariable int id) {
-        return new ResponseEntity<>(userService.findFriends(id), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getFriendsOfUser(id), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/friends/common/{friendId}")
     public ResponseEntity<List<User>> getCommonFriends(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
-        return new ResponseEntity<>(userService.findCommonFriends(id, friendId), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getCommonFriends(id, friendId), HttpStatus.OK);
     }
 
     @PostMapping

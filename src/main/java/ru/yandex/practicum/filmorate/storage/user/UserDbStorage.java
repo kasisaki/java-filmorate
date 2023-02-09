@@ -26,10 +26,10 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public SqlRowSet findUser(Integer id) {
+    public SqlRowSet findUser(Integer userId) {
         String sql = "SELECT * FROM users WHERE USER_ID = ?";
 
-        return jdbcTemplate.queryForRowSet(sql, id);
+        return jdbcTemplate.queryForRowSet(sql, userId);
     }
 
     @Override
@@ -63,16 +63,16 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Integer delete(Integer id) {
+    public Integer delete(Integer userId) {
         String sql = "DELETE FROM users WHERE user_id =?";
 
-        return jdbcTemplate.update(sql, id);
+        return jdbcTemplate.update(sql, userId);
     }
 
     @Override
-    public SqlRowSet findFriends(Integer id) {
+    public SqlRowSet findFriends(Integer userId) {
         String sql = String.format("SELECT * FROM users RIGHT JOIN ((SELECT TO_USER as t FROM FRIENDSHIPS WHERE FROM_USER = %d) " +
-                "UNION (SELECT FROM_USER FROM FRIENDSHIPS WHERE TO_USER= %d AND ACCEPTED= true)) ON users.user_id = t", id, id);
+                "UNION (SELECT FROM_USER FROM FRIENDSHIPS WHERE TO_USER= %d AND ACCEPTED= true)) ON users.user_id = t", userId, userId);
 
         return jdbcTemplate.queryForRowSet(sql);
     }
@@ -100,8 +100,8 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public boolean doesUserExist(int user_id) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE USER_ID = ?", user_id);
+    public boolean doesUserExist(int userId) {
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE USER_ID = ?", userId);
 
         return  userRows.next();
     }

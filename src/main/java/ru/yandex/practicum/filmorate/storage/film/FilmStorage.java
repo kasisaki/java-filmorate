@@ -10,7 +10,7 @@ public interface FilmStorage {
 
     SqlRowSet findAll();
 
-    SqlRowSet findFilm(int id);
+    SqlRowSet findFilm(int filmId);
 
     Integer create(@Valid @RequestBody Film film);
 
@@ -20,7 +20,7 @@ public interface FilmStorage {
 
     void unlike(int filmId, int userId);
 
-    SqlRowSet getPopular(int limitTo);
+    SqlRowSet findPopular(int limitTo);
 
     SqlRowSet getFilmMpaFromDB(int filmId);
 }

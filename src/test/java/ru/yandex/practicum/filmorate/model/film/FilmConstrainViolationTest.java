@@ -1,8 +1,7 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.model.film;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.model.film.Film;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -14,7 +13,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FilmControllerTest {
+public class FilmConstrainViolationTest {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
     Set<ConstraintViolation<Film>> violations;

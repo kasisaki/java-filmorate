@@ -19,12 +19,12 @@ public class GenreController {
     private final GenreService genreService;
 
     @GetMapping
-    public List<Genre> findAll() {
-        return genreService.findAllGenres();
+    public List<Genre> findAllGenres() {
+        return genreService.findAllGenres(); //вернет или список жанров или пустой лист
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Genre> findGenre(@PathVariable(required = false) int id) {
-        return new ResponseEntity<>(genreService.findGenre(id), HttpStatus.OK);
+    public ResponseEntity<Genre> getGenre(@PathVariable(required = false) int id) {
+        return new ResponseEntity<>(genreService.getGenre(id), HttpStatus.OK); //вернет нужный жанр или исключение
     }
 }

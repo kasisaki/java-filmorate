@@ -33,13 +33,13 @@ public class UserService {
         return users;
     }
 
-    public User findUser(int id) {
-        SqlRowSet urs = userStorage.findUser(id);
+    public User getUser(int userId) {
+        SqlRowSet urs = userStorage.findUser(userId);
 
         if (urs.next()) {
             return buildUser(urs);
         }
-        throw new ElementNotFoundException("User with id " + id + " not found");
+        throw new ElementNotFoundException("User with userId " + userId + " not found");
     }
 
     public User create(User user) {
@@ -97,9 +97,12 @@ public class UserService {
         throw new ElementNotFoundException(String.format("User %d is not in your friendList", friendId));
     }
 
-    public List<User> findFriends(int id) {
+    public List<User> getFriendsOfUser(int userId) {
+        if (!userStorage.findUser(userId).next()) {
+            throw new ElementNotFoundException(String.format("User with id %d not found", userId));
+        }
         List<User> users = new ArrayList<>();
-        SqlRowSet urs = userStorage.findFriends(id);
+        SqlRowSet urs = userStorage.findFriends(userId);
 
         while (urs.next()) {
             users.add(buildUser(urs));
@@ -108,13 +111,13 @@ public class UserService {
         return users;
     }
 
-    public List<User> findCommonFriends(int userId, int friendId) {
-        return findFriends(userId).stream().filter(u ->
-                findFriends(friendId).contains(u)).collect(Collectors.toList());
+    public List<User> getCommonFriends(int userId, int friendId) {
+        return getFriendsOfUser(userId).stream().filter(u ->
+                getFriendsOfUser(friendId).contains(u)).collect(Collectors.toList());
     }
 
-    public String delete(int id) {
-        return "Deleted " + userStorage.delete(id) + " entries";
+    public String delete(int userId) {
+        return "Deleted " + userStorage.delete(userId) + " entries";
     }
 
     private User buildUser(SqlRowSet urs) {

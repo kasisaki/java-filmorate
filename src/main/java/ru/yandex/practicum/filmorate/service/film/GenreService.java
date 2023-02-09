@@ -18,7 +18,7 @@ public class GenreService {
 
     public List<Genre> findAllGenres() {
         List<Genre> GenreSet = new ArrayList<>();
-        SqlRowSet urs = genreStorage.findAllGenres();
+        SqlRowSet urs = genreStorage.findAllGenres(); //or false
 
         while (urs.next()) {
             GenreSet.add(buildGenre(urs));
@@ -26,8 +26,8 @@ public class GenreService {
         return GenreSet;
     }
 
-    public Genre findGenre(int id) {
-        SqlRowSet urs = genreStorage.findGenre(id);
+    public Genre getGenre(int id) {
+        SqlRowSet urs = genreStorage.getGenre(id);
         if (urs.next()) {
             return buildGenre(urs);
         }
