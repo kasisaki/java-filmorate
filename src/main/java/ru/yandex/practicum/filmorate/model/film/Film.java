@@ -32,5 +32,5 @@ public class Film {
 
     private Set<Genre> genres;
     private Mpa mpa;
-    private int id;
+    private Integer id;
 }

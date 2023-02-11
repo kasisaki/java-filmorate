@@ -1,17 +1,17 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.jdbc.SqlGroup;
 import ru.yandex.practicum.filmorate.controller.film.FilmController;
 import ru.yandex.practicum.filmorate.controller.film.GenreController;
 import ru.yandex.practicum.filmorate.controller.film.MpaController;
@@ -32,7 +32,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SqlGroup({
+        @Sql(scripts = {"/schema.sql"},config = @SqlConfig(encoding = "UTF-8")),
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/test-data.sql"),
+        @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/drop-test-data.sql"),
+})
 class FilmorateApplicationTests {
 
     private final FilmController filmController;
@@ -40,35 +44,19 @@ class FilmorateApplicationTests {
     private final GenreController genreController;
     private final MpaController mpaController;
     private final JdbcTemplate jdbcTemplate;
-    SqlRowSet rs;
 
+    @BeforeEach
+    public void testTheDbIsEmpty() {
+        assertFalse(jdbcTemplate.queryForRowSet("SELECT * FROM USERS").next());
+        assertFalse(jdbcTemplate.queryForRowSet("SELECT * FROM FILMS").next());
+    }
 
     @Test
-    @Order(1)
-    void contextLoads() {
+    public void contextLoads() {
         assertTrue(true);
     }
 
     @Test
-    @Order(2)
-    public void testDatabaseEmptyUsers() {
-        rs = jdbcTemplate.queryForRowSet("SELECT * FROM USERS LEFT JOIN FILM_LIKES FL on USERS.USER_ID = FL.USER_ID " +
-                "LEFT JOIN FRIENDSHIPS F on USERS.USER_ID = F.FROM_USER");
-
-        assertFalse(rs.next());
-    }
-
-    @Test
-    @Order(3)
-    public void testDatabaseEmptyFilms() {
-        rs = jdbcTemplate.queryForRowSet("SELECT * FROM FILMS LEFT JOIN FILM_GENRES FG on FILMS.FILM_ID = FG.FILM_ID " +
-                "LEFT JOIN MPA M on FILMS.MPA_ID = M.MPA_ID");
-
-        assertFalse(rs.next());
-    }
-
-    @Test
-    @Order(4)
     public void testGetListOfGenres() {
         List<Genre> genres = genreController.findAllGenres();
 
@@ -78,9 +66,8 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(5)
     public void testAddUser() {
-        ResponseEntity<User> responseUser = userController.create(
+        ResponseEntity<User> responseUser = userController.createUser(
                 User.builder()
                         .login("FirstTestUser")
                         .email("first@email.com")
@@ -93,8 +80,8 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(6)
     public void testGetUserById() {
+        testAddUser();
         ResponseEntity<User> responseUser = userController.getUser(1);
 
         assertEquals(responseUser.getStatusCode(), HttpStatus.OK);
@@ -103,16 +90,16 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(7)
     public void testFindAllUsers() {
-        userController.create(
+        testAddUser();
+        userController.createUser(
                 User.builder()
                         .login("SecondTestUser")
                         .email("second@email.com")
                         .birthday(LocalDate.of(1900, 1, 1))
                         .build());
 
-        List<User> users = userController.findAll();
+        List<User> users = userController.findAllUsers();
 
         assertEquals(users.get(0).getId(), 1);
         assertEquals(users.get(0).getLogin(), "FirstTestUser");
@@ -122,7 +109,6 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(8)
     public void testGetUnknownUser() {
         try {
             ResponseEntity<User> userUnknown = userController.getUser(999);
@@ -133,16 +119,16 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(9)
     public void testAddFriend() {
+        testFindAllUsers();
         ResponseEntity<String> addFriendResponse = userController.addFriend(1, 2);
 
         assertEquals(addFriendResponse.getStatusCode(), HttpStatus.OK);
     }
 
     @Test
-    @Order(10)
     public void testGetFriends() {
+        testAddFriend();
         ResponseEntity<List<User>> friendUser = userController.getAllFriends(1);
 
         assertEquals(friendUser.getStatusCode(), HttpStatus.OK);
@@ -150,9 +136,9 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(11)
     public void testGetCommonFriends() {
-        userController.create(
+        testAddFriend();
+        userController.createUser(
                 User.builder()
                         .login("thirdTestUser")
                         .email("third@email.com")
@@ -168,8 +154,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(12)
-    public void testAddFilm() {
+    public void testAddFilms() {
         Film film1 = Film.builder()
                 .name("firstFilmName")
                 .duration(100)
@@ -178,6 +163,7 @@ class FilmorateApplicationTests {
                 .mpa(Mpa.builder().id(1).build())
                 .genres(Set.of(Genre.builder().id(1).build()))
                 .build();
+
         Film film2 = Film.builder()
                 .name("secondFilmName")
                 .duration(200)
@@ -196,8 +182,8 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(13)
     public void testFindAllFilm() {
+        testAddFilms();
         List<Film> films = filmController.findAll();
 
         assertEquals(films.get(0).getId(), 1);
@@ -212,8 +198,9 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(14)
     public void testLike() {
+        testAddFilms();
+        testGetCommonFriends();
         ResponseEntity<String> firstLike = filmController.likeFilm(2, 3);
         ResponseEntity<String> secondLike = filmController.likeFilm(2, 2);
 
@@ -225,8 +212,8 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(15)
     public void testFindPopular() {
+        testLike();
         List<Film> popular = filmController.findPopular(10);
 
         assertEquals(popular.size(), 2);
@@ -235,7 +222,6 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(16)
     public void testGetGenreById() {
         ResponseEntity<Genre> genre = genreController.getGenre(1);
 
@@ -244,7 +230,6 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Order(16)
     public void testGetMpaById() {
         ResponseEntity<Mpa> mpa = mpaController.getMpa(1);
 

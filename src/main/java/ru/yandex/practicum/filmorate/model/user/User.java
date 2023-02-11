@@ -9,13 +9,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @Builder
 public class User {
-    private int id;
+    private Integer id;
     @NotBlank(message = "Login must not be empty")
     @IsNotMatching(matchValue = ".*\\s+.*", message = "Login must not contain spaces")
     private String login;

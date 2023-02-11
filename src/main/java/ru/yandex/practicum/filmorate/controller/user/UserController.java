@@ -22,7 +22,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<User> findAll() {
+    public List<User> findAllUsers() {
         return userService.findAll(); //вернет список пользователей или пустой
     }
 
@@ -42,12 +42,12 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> create(@Valid @RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         return new ResponseEntity<>(userService.create(user), HttpStatus.OK);
     }
 
     @PutMapping
-    public ResponseEntity<User> update(@Valid @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         return new ResponseEntity<>(userService.update(user), HttpStatus.OK);
     }
 
@@ -62,7 +62,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") int id) {
+    public ResponseEntity<String> deleteUser(@PathVariable("id") int id) {
         return new ResponseEntity<>(userService.delete(id), HttpStatus.OK);
     }
 

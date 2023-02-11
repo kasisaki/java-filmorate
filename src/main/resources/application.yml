@@ -16,7 +16,10 @@ spring:
 
 logging:
   level:
-    root: INFO
     org:
-      springframework:
-        jdbc: WARN
+      springframework: WARN
+    root: ERROR
+    #    context: ERROR
+    #    web: ERROR
+    #    beans: WARN
+    #    jdbc: WARN
