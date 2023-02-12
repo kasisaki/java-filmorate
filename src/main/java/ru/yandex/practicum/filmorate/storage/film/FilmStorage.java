@@ -1,18 +1,26 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.film.Film;
 
 import javax.validation.Valid;
-import java.util.List;
 
 public interface FilmStorage {
 
-    List<Film> findAll();
+    SqlRowSet findAll();
 
-    Film findFilm(int id);
+    SqlRowSet findFilm(int filmId);
 
-    Film create(@Valid @RequestBody Film film);
+    Integer create(@Valid @RequestBody Film film);
 
-    Film update(@Valid @RequestBody Film film);
+    Integer update(@Valid @RequestBody Film film);
+
+    void like(int filmId, int userId);
+
+    void unlike(int filmId, int userId);
+
+    SqlRowSet findPopular(int limitTo);
+
+    SqlRowSet getFilmMpaFromDB(int filmId);
 }

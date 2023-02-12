@@ -1,10 +1,10 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.model.user;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -13,9 +13,12 @@ import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserControllerTest {
+@SpringBootTest
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class UserConstrainViolationTest {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
     Set<ConstraintViolation<User>> violations;
@@ -42,24 +45,6 @@ public class UserControllerTest {
         assertTrue(violations.isEmpty());
     }
 
-    @Test
-    public void validUserNoName() {
-        User user = User.builder().login("loginnospace")
-
-                .email("test@yandex.ru")
-
-                .birthday(LocalDate.of(1999, 12, 12))
-
-                .build();
-
-        UserController userController = new UserController(new UserService(new InMemoryUserStorage()));
-
-        userController.create(user);
-
-        violations = validator.validate(user);
-
-        assertEquals(userController.findAll().get(0).getName(), user.getLogin());
-    }
 
     @Test
     public void invalidLoginEmpty() {
